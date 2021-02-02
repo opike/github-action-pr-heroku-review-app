@@ -15,7 +15,12 @@ Toolkit.run(
     const fork = pr.head.repo.fork;
     const pr_number = pr.number;
     const repo_url = pr.head.repo.html_url;
-    const source_url = `${pr.head.repo.html_url}/tarball/${branch}`;
+    const repo_name = pr.head.repo.name;
+    const owner = pr.head.repo.owner.login;
+    const github_token = process.env.GITHUB_TOKEN;
+
+    // This worked:
+    const source_url = `https://${owner}:${github_token}@api.github.com/repos/${owner}/${repo_name}/tarball/${branch}`;
 
     let fork_repo_id;
     if (fork) {
@@ -28,6 +33,8 @@ Toolkit.run(
       fork,
       pr_number,
       source_url,
+      repo_name,
+      owner
     });
 
     let action = tools.context.payload.action;
@@ -115,7 +122,9 @@ Toolkit.run(
       // Otherwise we can complete it in this run
       try {
         tools.log.pending("Creating review app");
-        const resp = await heroku.post("/review-apps", {
+        const resp = await heroku.request({
+          path: "/review-apps",
+          method: "POST",
           body: {
             branch,
             pipeline: process.env.HEROKU_PIPELINE_ID,
@@ -127,8 +136,8 @@ Toolkit.run(
             pr_number,
             environment: {
               GIT_REPO_URL: repo_url,
-            },
-          },
+            }
+          }
         });
         tools.log.complete("Created review app");
       } catch (e) {
