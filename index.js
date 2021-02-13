@@ -166,6 +166,6 @@ Toolkit.run(
       "pull_request_target.labeled",
       "pull_request_target.closed",
     ],
-    secrets: ["GITHUB_PA_TOKEN", "HEROKU_API_TOKEN", "HEROKU_PIPELINE_ID"],
+    secrets: ["GITHUB_TOKEN", "GITHUB_PA_TOKEN", "HEROKU_API_TOKEN", "HEROKU_PIPELINE_ID"],
   }
 );
