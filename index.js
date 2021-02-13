@@ -17,10 +17,12 @@ Toolkit.run(
     const repo_url = pr.head.repo.html_url;
     const repo_name = pr.head.repo.name;
     const owner = pr.head.repo.owner.login;
-    const github_token = process.env.GITHUB_TOKEN;
+    // Note!! Make sure you use a personal access token and not the implicit
+    //        secrets.GITHUB_TOKEN
+    const github_pa_token = process.env.GITHUB_PA_TOKEN;
 
     // This worked:
-    const source_url = `https://${owner}:${github_token}@api.github.com/repos/${owner}/${repo_name}/tarball/${branch}`;
+    const source_url = `https://${owner}:${github_pa_token}@api.github.com/repos/${owner}/${repo_name}/tarball/${branch}`;
 
     let fork_repo_id;
     if (fork) {
@@ -164,6 +166,6 @@ Toolkit.run(
       "pull_request_target.labeled",
       "pull_request_target.closed",
     ],
-    secrets: ["GITHUB_TOKEN", "HEROKU_API_TOKEN", "HEROKU_PIPELINE_ID"],
+    secrets: ["GITHUB_PA_TOKEN", "HEROKU_API_TOKEN", "HEROKU_PIPELINE_ID"],
   }
 );
