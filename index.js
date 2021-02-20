@@ -46,27 +46,30 @@ Toolkit.run(
 
     // We can delete a review app without them being a collaborator
     // as the only people that can close PRs are maintainers or the author
-    if (action === "closed") {
-      // Fetch all PRs
-      tools.log.pending("Listing review apps");
-      const reviewApps = await heroku.get(
-        `/pipelines/${process.env.HEROKU_PIPELINE_ID}/review-apps`
-      );
-      tools.log.complete("Fetched review app list");
+    // HIPOCAMPO TODO: Need to put the clean-up logic back in, here or another
+    //                 action.
+    // if (action === "closed") {
 
-      // Filter to the one for this PR
-      const app = reviewApps.find((app) => app.pr_number == pr_number);
-      if (!app) {
-        tools.log.info(`Could not find review app for PR number ${pr_number}`);
-        return;
-      }
+    // Fetch all PRs
+    tools.log.pending("Listing review apps");
+    const reviewApps = await heroku.get(
+      `/pipelines/${process.env.HEROKU_PIPELINE_ID}/review-apps`
+    );
+    tools.log.complete("Fetched review app list");
 
-      // Delete the PR
-      tools.log.pending("Deleting review app");
+    // Filter to the one for this PR
+    const app = reviewApps.find((app) => app.pr_number == pr_number);
+    if (!app) {
+      tools.log.info(`Did not find review app for PR number ${pr_number}`);
+      // return;
+    } else {
+      tools.log.pending("Deleting existing review app");
       await heroku.delete(`/review-apps/${app.id}`);
       tools.log.complete("Review app deleted");
-      return;
     }
+
+    //   return;
+    // }
 
     // Do they have the required permissions?
     let requiredCollaboratorPermission = process.env.COLLABORATOR_PERMISSION;
@@ -122,6 +125,15 @@ Toolkit.run(
         );
         tools.log.success("Action complete");
         return;
+      }
+
+      try {
+        const resp = await heroku.request({
+          path: `/review-apps${id}`,
+          method: "DELETE"
+        });
+      } catch (error) {
+
       }
 
       // Otherwise we can complete it in this run
