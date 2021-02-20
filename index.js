@@ -158,6 +158,8 @@ Toolkit.run(
         });
         tools.log.complete("Created review app");
       } catch (e) {
+        // HIPOCAMPO UPDATE: We are now deleting the existing review apps
+        //                   every time so we should never get here.
         // A 409 is a conflict, which means the app already exists
         if (e.statusCode !== 409) {
           throw e;
