@@ -41,6 +41,9 @@ Toolkit.run(
 
     let action = tools.context.payload.action;
 
+    // Output value indicating if this was a new or existing deployment.
+    let status = 'new';
+
     // We can delete a review app without them being a collaborator
     // as the only people that can close PRs are maintainers or the author
     if (action === "closed") {
@@ -147,10 +150,13 @@ Toolkit.run(
         if (e.statusCode !== 409) {
           throw e;
         }
+        status = 'existing';
         tools.log.complete("Review app is already created");
       }
     }
 
+    // print(f"::set-output name=review_app_name::{review_app_name}")
+    tools.outputs.status = status;
     tools.log.success("Action complete");
   },
   {
@@ -164,7 +170,7 @@ Toolkit.run(
       "pull_request_target.reopened",
       "pull_request_target.synchronize",
       "pull_request_target.labeled",
-      "pull_request_target.closed",
+      "pull_request_target.closed"
     ],
     secrets: ["GITHUB_TOKEN", "GITHUB_PA_TOKEN", "HEROKU_API_TOKEN", "HEROKU_PIPELINE_ID"],
   }
